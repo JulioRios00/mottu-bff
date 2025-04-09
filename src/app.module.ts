@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { CatsModule } from './cats/cats.module';
-import { RickAndMortyModule } from './rickandmorty/rick-and-morty.module';
+import { CharacterModule } from './rickandmorty/character.module';
 import { PairsModule } from './pairs/pairs.module';
 import { SharedModule } from './shared/sharedModule.module';
 
@@ -8,7 +8,7 @@ import { SharedModule } from './shared/sharedModule.module';
   imports: [
     SharedModule,
     CatsModule, 
-    RickAndMortyModule, 
+    CharacterModule, 
     PairsModule
   ],
 })

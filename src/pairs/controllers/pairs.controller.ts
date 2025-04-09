@@ -1,6 +1,6 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { PairsService } from '../services/pairs.service';
-import { PairResponseDto, PairSearchQueryDto } from '../dtos/pairs-response.dto';
+import { PairResponseDto } from '../dtos/pairs-response.dto';
 
 @Controller('v1/pairs')
 export class PairsController {
@@ -13,8 +13,9 @@ export class PairsController {
 
   @Get('search')
   async searchPairs(
-    @Query() query: PairSearchQueryDto,
-  ): Promise<PairResponseDto> {
-    return this.pairsService.searchPairs(query);
+    @Query('characterName') characterName?: string,
+    @Query('catBreed') catBreed?: string,
+  ): Promise<PairResponseDto[]> {
+    return this.pairsService.searchPairs(characterName, catBreed);
   }
 }

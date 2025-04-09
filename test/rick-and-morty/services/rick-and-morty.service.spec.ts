@@ -1,15 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { RickService } from 'src/rickandmorty/services/rick-and-morty.service';
-import { RickApiAdapter } from 'src/rickandmorty/adapters/rick-and-morty.adapter';
+import { CharacterService } from 'src/rickandmorty/services/character.service';
+import { CharacterAdapter } from 'src/rickandmorty/adapters/character.adapter';
 import { CacheService } from '../../../src/shared/cache.service';
-import { RickAndMortyResponseDto } from 'src/rickandmorty/dtos/rick-and-morty-response';
+import { CharacterResponseDto } from 'src/rickandmorty/dtos/character-response';
 
 describe('RickAndMortyService', () => {
-  let service: RickService;
-  let rickAndMortyApiAdapter: RickApiAdapter;
+  let service: CharacterService;
+  let rickAndMortyApiAdapter: CharacterAdapter;
   let cacheService: CacheService;
 
-  const mockCharacter: RickAndMortyResponseDto = {
+  const mockCharacter: CharacterResponseDto = {
 	id: 1,
     name: 'Rick Sanchez',
     image: 'https://example.com/rick.jpg',
@@ -19,9 +19,9 @@ describe('RickAndMortyService', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        RickService,
+        CharacterService,
         {
-          provide: RickApiAdapter,
+          provide: CharacterAdapter,
           useValue: {
             getRandomCharacter: jest.fn(),
             searchCharacters: jest.fn(),
@@ -37,8 +37,8 @@ describe('RickAndMortyService', () => {
       ],
     }).compile();
 
-    service = module.get<RickService>(RickService);
-    rickAndMortyApiAdapter = module.get<RickApiAdapter>(RickApiAdapter);
+    service = module.get<CharacterService>(CharacterService);
+    rickAndMortyApiAdapter = module.get<CharacterAdapter>(CharacterAdapter);
     cacheService = module.get<CacheService>(CacheService);
   });
 

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CatApiAdapter } from '../adapters/cats-api.adapter';
 import { CatResponseDto, BreedResponseDto } from '../dtos/cats-response.dto';
 import { CacheService } from '../../shared/cache.service';
@@ -10,7 +10,28 @@ export class CatsService {
     private readonly cacheService: CacheService
   ) {}
 
-  async getRandomCat(breedId?: string): Promise<CatResponseDto> {
+  async getRandomCat(breedName?: string): Promise<CatResponseDto> {
+    let breedId: string | undefined = undefined;
+    
+    if (breedName) {
+      const breeds = await this.getBreeds();
+      const breed = breeds.find(b => 
+        b.name.toLowerCase() === breedName.toLowerCase()
+      );
+      
+      if (breed) {
+        breedId = breed.id;
+      } else {
+        const matchingBreed = breeds.find(b => 
+          b.name.toLowerCase().includes(breedName.toLowerCase())
+        );
+        
+        if (matchingBreed) {
+          breedId = matchingBreed.id;
+        }
+      }
+    }
+    
     const cacheKey = `cat:random:${breedId || 'any'}`;
     const cachedCat = await this.cacheService.get<CatResponseDto>(cacheKey);
     
@@ -19,8 +40,7 @@ export class CatsService {
     }
 
     const cat = await this.catApiAdapter.getRandomCat(breedId);
-    await this.cacheService.set(cacheKey, cat, 3600); // Cache for 1 hour
-    
+    await this.cacheService.set(cacheKey, cat, 3600); 
     return cat;
   }
 
@@ -33,8 +53,7 @@ export class CatsService {
     }
 
     const breeds = await this.catApiAdapter.getBreeds();
-    await this.cacheService.set(cacheKey, breeds, 86400); // Cache for 24 hours
-    
+    await this.cacheService.set(cacheKey, breeds, 86400); 
     return breeds;
   }
 }

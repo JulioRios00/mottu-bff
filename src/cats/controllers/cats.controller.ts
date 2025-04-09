@@ -1,15 +1,10 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 import { CatsService } from '../services/cats.service';
-import { CatResponseDto, BreedResponseDto } from '../dtos/cats-response.dto';
+import { BreedResponseDto } from '../dtos/cats-response.dto';
 
-@Controller('v1/cats')
+@Controller('v1')
 export class CatsController {
   constructor(private readonly catsService: CatsService) {}
-
-  @Get()
-  async getRandomCat(@Query('breed') breedId?: string): Promise<CatResponseDto> {
-    return this.catsService.getRandomCat(breedId);
-  }
 
   @Get('breeds')
   async getBreeds(): Promise<BreedResponseDto[]> {

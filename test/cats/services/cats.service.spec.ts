@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { CatsService } from 'src/cats/services/cats.service';
-import { CatApiAdapter } from 'src/cats/adapters/cats-api.adapter';
-import { CacheService } from 'src/shared/cache.service';
-import { CatResponseDto, BreedResponseDto } from 'src/cats/dtos/cats-response.dto';
+import { CatsService } from '../../../src/cats/services/cats.service';
+import { CatApiAdapter } from '../../../src/cats/adapters/cats-api.adapter';
+import { CacheService } from '../../../src/shared/cache.service';
+import { CatResponseDto, BreedResponseDto } from '../../../src/cats/dtos/cats-response.dto';
 
 describe('CatsService', () => {
   let service: CatsService;
@@ -10,13 +10,13 @@ describe('CatsService', () => {
   let cacheService: CacheService;
 
   const mockCat: CatResponseDto = {
-    id: 'id',
+    id: 'abc123',
     image: 'https://example.com/cat.jpg',
   };
 
   const mockBreeds: BreedResponseDto[] = [
-    { id: 'breed1', name: 'Vira lata' },
-    { id: 'breed2', name: 'Persa' },
+    { id: 'siam', name: 'Siamese', },
+    { id: 'beng', name: 'Bengal'},
   ];
 
   beforeEach(async () => {
@@ -52,64 +52,67 @@ describe('CatsService', () => {
   describe('getRandomCat', () => {
     it('should return cached cat if available', async () => {
       jest.spyOn(cacheService, 'get').mockResolvedValue(mockCat);
-
+      
       const result = await service.getRandomCat();
       
-      expect(result).toEqual(mockCat);
       expect(cacheService.get).toHaveBeenCalledWith('cat:random:any');
       expect(catApiAdapter.getRandomCat).not.toHaveBeenCalled();
+      expect(result).toEqual(mockCat);
     });
 
-    it('should fetch and cache a new cat if not in cache', async () => {
+    it('should fetch and cache cat if not in cache', async () => {
       jest.spyOn(cacheService, 'get').mockResolvedValue(null);
       jest.spyOn(catApiAdapter, 'getRandomCat').mockResolvedValue(mockCat);
       jest.spyOn(cacheService, 'set').mockResolvedValue(undefined);
-
+      
       const result = await service.getRandomCat();
       
-      expect(result).toEqual(mockCat);
       expect(cacheService.get).toHaveBeenCalledWith('cat:random:any');
-      expect(catApiAdapter.getRandomCat).toHaveBeenCalledWith(undefined);
+      expect(catApiAdapter.getRandomCat).toHaveBeenCalled();
       expect(cacheService.set).toHaveBeenCalledWith('cat:random:any', mockCat, 3600);
+      expect(result).toEqual(mockCat);
     });
 
     it('should use breedId in cache key and API call when provided', async () => {
-      const breedId = 'siamese';
+      // Mock getBreeds to return the mock breeds
+      jest.spyOn(service, 'getBreeds').mockResolvedValue(mockBreeds);
+      
       jest.spyOn(cacheService, 'get').mockResolvedValue(null);
       jest.spyOn(catApiAdapter, 'getRandomCat').mockResolvedValue(mockCat);
       jest.spyOn(cacheService, 'set').mockResolvedValue(undefined);
-
-      const result = await service.getRandomCat(breedId);
       
+      const result = await service.getRandomCat('Siamese');
+      
+      expect(service.getBreeds).toHaveBeenCalled();
+      expect(cacheService.get).toHaveBeenCalledWith('cat:random:siam');
+      expect(catApiAdapter.getRandomCat).toHaveBeenCalledWith('siam');
+      expect(cacheService.set).toHaveBeenCalledWith('cat:random:siam', mockCat, 3600);
       expect(result).toEqual(mockCat);
-      expect(cacheService.get).toHaveBeenCalledWith(`cat:random:${breedId}`);
-      expect(catApiAdapter.getRandomCat).toHaveBeenCalledWith(breedId);
-      expect(cacheService.set).toHaveBeenCalledWith(`cat:random:${breedId}`, mockCat, 3600);
     });
   });
 
   describe('getBreeds', () => {
     it('should return cached breeds if available', async () => {
       jest.spyOn(cacheService, 'get').mockResolvedValue(mockBreeds);
-
+      
       const result = await service.getBreeds();
       
-      expect(result).toEqual(mockBreeds);
       expect(cacheService.get).toHaveBeenCalledWith('cat:breeds');
       expect(catApiAdapter.getBreeds).not.toHaveBeenCalled();
+      expect(result).toEqual(mockBreeds);
     });
 
     it('should fetch and cache breeds if not in cache', async () => {
       jest.spyOn(cacheService, 'get').mockResolvedValue(null);
       jest.spyOn(catApiAdapter, 'getBreeds').mockResolvedValue(mockBreeds);
       jest.spyOn(cacheService, 'set').mockResolvedValue(undefined);
-
+      
       const result = await service.getBreeds();
       
-      expect(result).toEqual(mockBreeds);
       expect(cacheService.get).toHaveBeenCalledWith('cat:breeds');
       expect(catApiAdapter.getBreeds).toHaveBeenCalled();
       expect(cacheService.set).toHaveBeenCalledWith('cat:breeds', mockBreeds, 86400);
+      expect(result).toEqual(mockBreeds);
     });
   });
 });

@@ -1,8 +1,8 @@
-import { RickAndMortyResponseDto } from '../../rickandmorty/dtos/rick-and-morty-response';
+import { CharacterResponseDto } from '../../rickandmorty/dtos/character-response';
 import { CatResponseDto } from '../../cats/dtos/cats-response.dto';
 
 export class PairResponseDto {
-  character: RickAndMortyResponseDto;
+  character: CharacterResponseDto;
   cat: CatResponseDto;
 }
 
