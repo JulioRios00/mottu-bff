@@ -37,6 +37,7 @@ _Par aleatório_
 GET http://localhost:3000/v1/pairs
 
 Resposta aleatória:
+```
 {
 	"character": {
 			"id": 548,
@@ -50,10 +51,12 @@ Resposta aleatória:
 		}
 }
 
+```
+
 _Filtro por personagem e raça_
 
 GET http://localhost:3000/v1/pairs/search?characterName=Morty&catBreed=aeg
-
+```
 [
 	{
 		"character": {
@@ -70,11 +73,14 @@ GET http://localhost:3000/v1/pairs/search?characterName=Morty&catBreed=aeg
 	...
 ]
 
+
+```
+
 _Raças_
 
 GET http://localhost:3000/v1/breeds
 
-
+```
 [
 	{
         "id": "abys",
@@ -86,19 +92,21 @@ GET http://localhost:3000/v1/breeds
     }, 
 	...
 ]
+```
+
 
 ## Como rodar o projeto
 
 ### Utilizando Docker 
 
 ```
-	docker compose up
+docker compose up
 ```
 
 ### Rodando diretamente pelo terminal
 
 ```
-	npm run start:dev
+npm run start:dev
 ```
 
 ### Testes
